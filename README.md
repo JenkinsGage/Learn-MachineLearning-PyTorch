@@ -25,12 +25,12 @@ A jupyter lab server is running on port 8888 once the container is up.
 ## NLP
 - [Build a Translation Model Using the Transformer Module of PyTorch](./NLP/Translation/TranslationModelUsingTransformerModuleFromScratch.IPYNB)<br>
 I have used the transformer module in pytorch to build a model for translation from Chinese to English where the Chinese is tokenized by jieba and the English is tokenized by basic English tokenizer from torchtext. And the model is trained on wmt19 dataset from huggenface.
-- [Build Tokenizer Using Tokenizers Library](./NLP/Preprocessing/Tokenizer.IPYNB)<br>
+- [Build Tokenizer Using Tokenizers Library](./NLP/Preprocessing/BuildWordPieceTokenizerUsingTokenizersLibrary.IPYNB)<br>
 I have used tokenizers library to build tokenizers for both English and Chinese. I used the WordPiece model, so you can use it to build tokenizers for other language as well.
 - [Build a Translation Model Using the XFormers Library and Tokenizers](./NLP/Translation/TranslationModelUsingXFormersAndTokenizers.IPYNB)<br>
-- [Using Pretrained Model from Huggingface for Paraphrasing](./NLP/Paraphrasing/InferenceFromTransformers.IPYNB)<br>
+- [Using Pretrained Model from Huggingface for Paraphrasing](./NLP/Paraphrasing/UsingPretrainedModelFromHuggingfaceForParaphrasing.IPYNB)<br>
 I used a model from huggingface **humarin/chatgpt_paraphraser_on_T5_base** to paraphrase sentences 
-- [Paraphrase with Gradio WebUI App](./NLP/Paraphrases/GradioApp.py)<br>
+- [Paraphrase with Gradio WebUI App](./NLP/Paraphrasing/GradioApp.py)<br>
 I used gradio to build a webui for interacting with the **humarin/chatgpt_paraphraser_on_T5_base** model
 ## Computer Vision
 ...
