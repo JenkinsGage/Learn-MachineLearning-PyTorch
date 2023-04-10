@@ -27,11 +27,16 @@ Once the container is up and running, a Jupyter Lab server will be available on 
 # Contents
 This repository contains a variety of notebooks covering different areas of machine learning. Here's an overview of what you'll find:
 ## Natural Language Processing (NLP)
+### Neural Machine Translation
 - [Build a Translation Model Using the Transformer Module of PyTorch](./NLP/Translation/TranslationModelUsingTransformerModuleFromScratch.IPYNB)<br>
 In this notebook, I use PyTorch's transformer module to build a translation model that can translate Chinese to English. The Chinese text is tokenized using jieba and the English text is tokenized using torchtext's basic English tokenizer. The model is trained on the wmt19 dataset from Hugging Face.
 - [Build Tokenizer Using Tokenizers Library](./NLP/Preprocessing/BuildWordPieceTokenizerUsingTokenizersLibrary.IPYNB)<br>
 Here I use the tokenizers library to build tokenizers for both English and Chinese. The WordPiece model is used, so this approach can be applied to other languages as well.
 - [Build a Translation Model Using the XFormers Library and Tokenizers](./NLP/Translation/TranslationModelUsingXFormersAndTokenizers.IPYNB)<br>
+In this notebook, I use XFormers library to build the transformer model quickly. And such memory efficient model uses less memory which means we can train a more complex model with limited memory. I also use the tokenizers I just trained in [[Build a Translation Model Using the XFormers Library and Tokenizers](./NLP/Translation/TranslationModelUsingXFormersAndTokenizers.IPYNB)], so please make sure to run this notebook first to get tokenizers before training the model.
+- [Build a Translation Model With Pretrained BERT as Encoder](./NLP/Translation/TranslationModelUsingBERT.IPYNB)<br>
+In this notebook, I use a pretrained BERT model to replace the encoder in the last notebook and freeze all the parameters of the encoder. I also tried to use some learning rate warmup techniques to make the model more stable.
+### Paraphrasing
 - [Using Pretrained Model from Huggingface for Paraphrasing](./NLP/Paraphrasing/UsingPretrainedModelFromHuggingfaceForParaphrasing.IPYNB)<br>
 In this notebook, I use a pretrained model from Hugging Face **(humarin/chatgpt_paraphraser_on_T5_base)** to paraphrase sentences.
 - [Paraphrase with Gradio WebUI App](./NLP/Paraphrasing/GradioApp.py)<br>
