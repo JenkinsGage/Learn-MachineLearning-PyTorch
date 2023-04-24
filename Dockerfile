@@ -8,7 +8,7 @@ SHELL [ "conda", "run", "-n", "torch", "/bin/bash", "-c"]
 # Install pytorch with cuda 11.8, jupyter, transformers, datasets, xformers, and triton
 RUN conda install pytorch torchvision torchaudio torchtext pytorch-cuda=11.8 -c pytorch -c nvidia && \
     conda install -c anaconda jupyter && \
-    pip install transformers datasets xformers triton
+    pip install transformers datasets xformers triton seaborn timm
 # Add the torch conda environment to jupyter lab
 RUN ipython kernel install --user --name=torch
 # Expose port 8888 that jupyter will use
