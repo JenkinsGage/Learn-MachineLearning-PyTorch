@@ -39,7 +39,7 @@ NUM_WARMUP_EPOCHS = 1
 LEARNING_RATE = 4e-5
 PENALTY_L1 = 1e-6
 FFT_TOPK = 12
-FFT_ALPHA = 0.2
+FFT_ALPHA = 0.25
 
 # The following parameters are determined by the dataset
 STATIC_ATTRIBUTES_DIM = 20

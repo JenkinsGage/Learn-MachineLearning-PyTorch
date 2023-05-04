@@ -100,7 +100,7 @@ def collate_fn(data_columns=['Close']):
 def roll_norm(x:torch.Tensor, std_norm=True, eps=1e-12):
     x0 = x[:, 0]
     x_roll = torch.roll(x, shifts=1, dims=1)
-    delta = x/x_roll - 1
+    delta = x/(x_roll + eps) - 1
 
     if len(delta.shape) == 3:
         delta[:, 0, :] = 0.0
@@ -120,5 +120,5 @@ def reverse_roll_norm(delta: torch.Tensor, x0: torch.Tensor, mean: torch.Tensor,
     x = torch.zeros_like(delta)
     x[:, 0] = x0
     for i in range(1, x.shape[1]):
-        x[:, i] = x[:, i-1] * (delta[:, i]+1)
+        x[:, i] = (x[:, i-1] + eps) * (delta[:, i]+1)
     return x
