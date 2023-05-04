@@ -59,22 +59,3 @@ class TiDE(nn.Module):
         y += self.global_residual_connection(lookback)
         return y
     
-class LogNorm(nn.Module):
-    def __init__(self, eps=1e-9):
-        super(LogNorm, self).__init__()
-        self.eps = eps
-        self.mean = 0
-        self.std = 1
-        
-    def forward(self, x):
-        x = torch.log(1+x)
-        self.mean = torch.mean(x, dim=-1, keepdim=True)
-        self.std = torch.std(x, dim=-1, keepdim=True)
-        return (x-self.mean)/(self.std+self.eps)
-    
-    def inverse(self, x):
-        return torch.exp(x*self.std+self.mean)-1
-    
-    def normalize(self, x):
-        x = torch.log(1+x)
-        return (x-self.mean)/(self.std+self.eps)
