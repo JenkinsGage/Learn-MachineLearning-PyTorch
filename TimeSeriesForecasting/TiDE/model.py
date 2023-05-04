@@ -25,9 +25,10 @@ class ResMLP(nn.Module):
 
 
 class TiDE(nn.Module):
-    def __init__(self, lookback_steps: int, horizon_steps: int, static_attributes_dim: int, dynamic_covariates_dim: int, dynamic_covariates_projection_dim: int, hidden_dim: int, num_encoder_layers: int, num_decoder_layers: int, decoder_output_dim: int, temporal_decoder_hidden_dim: int, dropout: float = 0.1):
+    def __init__(self, lookback_steps: int, horizon_steps: int, static_attributes_dim: int, dynamic_covariates_dim: int, dynamic_covariates_projection_dim: int, hidden_dim: int, num_encoder_layers: int, num_decoder_layers: int, decoder_output_dim: int, temporal_decoder_hidden_dim: int, lookback_features=1, dropout: float = 0.1):
         super(TiDE, self).__init__()
         self.lookback_steps = lookback_steps
+        self.lookback_features = lookback_features
         self.horizon_steps = horizon_steps
         self.static_attributes_dim = static_attributes_dim
         self.dynamic_covariates_dim = dynamic_covariates_dim
@@ -40,16 +41,17 @@ class TiDE(nn.Module):
         self.dropout = dropout
 
         self.dynamic_covariates_feature_projection = ResMLP(in_dim=self.dynamic_covariates_dim, hidden_dim=self.hidden_dim, out_dim=self.dynamic_covariates_projection_dim)
-        self.encoder_input_dim = lookback_steps + static_attributes_dim + (lookback_steps + horizon_steps) * dynamic_covariates_projection_dim
+        self.encoder_input_dim = lookback_steps*lookback_features + static_attributes_dim + (lookback_steps + horizon_steps) * dynamic_covariates_projection_dim
         self.encoders = nn.Sequential(*[ResMLP(in_dim=self.encoder_input_dim if _ == 0 else self.hidden_dim, hidden_dim=self.hidden_dim, out_dim=self.hidden_dim, dropout=self.dropout) for _ in range(self.num_encoder_layers)])
         self.decoder_output_features = self.horizon_steps * self.decoder_output_dim
         self.decoders = nn.Sequential(*[ResMLP(in_dim=self.hidden_dim if _==0 else self.decoder_output_features, hidden_dim=self.hidden_dim, out_dim=self.decoder_output_features, dropout=self.dropout) for _ in range(self.num_decoder_layers)])
         self.temporal_decoder_input_dim = self.decoder_output_dim + self.dynamic_covariates_projection_dim
         self.temporal_decoder = ResMLP(in_dim=self.temporal_decoder_input_dim, hidden_dim=self.temporal_decoder_hidden_dim, out_dim=1, dropout=self.dropout)
-        self.global_residual_connection = nn.Linear(self.lookback_steps, self.horizon_steps, bias=False)
+        self.global_residual_connection = nn.Linear(self.lookback_steps*lookback_features, self.horizon_steps, bias=False)
 
     def forward(self, lookback: torch.Tensor, static_attributes: torch.Tensor, dynamic_covariates: torch.Tensor):
         dynamic_covariates_projection = self.dynamic_covariates_feature_projection(dynamic_covariates)
+        lookback = torch.flatten(lookback, start_dim=1)
         encoder_input = torch.cat([lookback, static_attributes, torch.flatten(dynamic_covariates_projection, start_dim=1)], dim=-1)
         embedding = self.encoders(encoder_input)
         g = self.decoders(embedding)

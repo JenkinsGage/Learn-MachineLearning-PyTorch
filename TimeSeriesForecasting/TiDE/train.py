@@ -18,14 +18,15 @@ DATA_ROOT = './Data/StockMarket/'
 LOOKBACK_STEPS = 270
 HORIZON_STEPS = 60
 DYNAMIC_COVARIATES_PROJECTION_DIM = 2
-HIDDEN_DIM = 512
-NUM_ENCODER_LAYERS = 2
-NUM_DECODER_LAYERS = 4
+HIDDEN_DIM = 1024
+NUM_ENCODER_LAYERS = 3
+NUM_DECODER_LAYERS = 2
 DECODER_OUTPUT_DIM = 64
 TEMPORAL_DECODER_HIDDEN_DIM = 64
 DROPOUT = 0.5
 
-DATA_COLUMNS = ['Close']
+DATA_COLUMNS = ['Open', 'High', 'Low', 'Close', 'Volume']
+TGT_COLUMN = 3 # TGT_COLUMN must be specified if len(DATA_COLUMNS) > 1
 DATASET_ROLL_STEPS=7
 TRAIN_SPLIT = 0.95
 BATCH_SIZE = 64
@@ -93,6 +94,8 @@ def train_epochs(model, optimizer, epochs):
         for lookback_batch, horizon_batch, static_attributes_batch, dynamic_covariates_batch in tqdm(ts_dataloader_train, desc=f'Epoch {epoch}'):
             lookback_batch = lookback_batch.to(DEVICE)
             lookback_batch, _, _, _ = roll_norm(lookback_batch)
+            if len(DATA_COLUMNS) > 1:
+                horizon_batch = horizon_batch[:, :, TGT_COLUMN]
             horizon_batch = horizon_batch.to(DEVICE)
             horizon_batch, _, _, _ = roll_norm(horizon_batch)
             static_attributes_batch = static_attributes_batch.to(DEVICE)
@@ -113,6 +116,8 @@ def eval_epoch(model):
         for lookback_batch, horizon_batch, static_attributes_batch, dynamic_covariates_batch in tqdm(ts_dataloader_val, desc='Run Validation'):
             lookback_batch = lookback_batch.to(DEVICE)
             lookback_batch, l0, lmean, lstd = roll_norm(lookback_batch)
+            if len(DATA_COLUMNS) > 1:
+                horizon_batch = horizon_batch[:, :, TGT_COLUMN]
             horizon_batch = horizon_batch.to(DEVICE)
             horizon_batch, h0, hmean, hstd = roll_norm(horizon_batch)
             static_attributes_batch = static_attributes_batch.to(DEVICE)
@@ -164,7 +169,7 @@ if __name__ == '__main__':
     ts_dataloader_val = DataLoader(stock_dataset, batch_size=BATCH_SIZE, collate_fn=collate, sampler=sampler_val, num_workers=NUM_WORKERS)
 
     model = TiDE(lookback_steps=LOOKBACK_STEPS, horizon_steps=HORIZON_STEPS, static_attributes_dim=STATIC_ATTRIBUTES_DIM, dynamic_covariates_dim=DYNAMIC_COVARIATES_DIM, dynamic_covariates_projection_dim=DYNAMIC_COVARIATES_PROJECTION_DIM,
-                hidden_dim=HIDDEN_DIM, num_encoder_layers=NUM_ENCODER_LAYERS, num_decoder_layers=NUM_DECODER_LAYERS, decoder_output_dim=DECODER_OUTPUT_DIM, temporal_decoder_hidden_dim=TEMPORAL_DECODER_HIDDEN_DIM, dropout=DROPOUT)
+                hidden_dim=HIDDEN_DIM, num_encoder_layers=NUM_ENCODER_LAYERS, num_decoder_layers=NUM_DECODER_LAYERS, decoder_output_dim=DECODER_OUTPUT_DIM, temporal_decoder_hidden_dim=TEMPORAL_DECODER_HIDDEN_DIM, lookback_features=len(DATA_COLUMNS), dropout=DROPOUT)
     print(model)
     print(f'Model Num Params: {sum(p.numel() for p in model.parameters() if p.requires_grad)/1e6:.2f} M')
     for name, param in model.named_parameters():
